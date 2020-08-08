@@ -16,8 +16,7 @@
     "jsonwebtoken": "^8.5.1",
     "mongodb": "^2.1.11",
     "mongoose": "^5.9.26",
-    "morgan": "^1.10.0",
-    "serve-favicon": "^2.5.0"
+    "morgan": "^1.10.0"
   },
   "devDependencies": {
     "handlebars": "^4.5.0"
