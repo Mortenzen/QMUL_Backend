@@ -11,7 +11,7 @@ var routes = require('./routes/index');
 var app = express();
 
 // MONGOOSE CONNECTION
-mongoose.connect('mongodb://localhost:27017/test', {useNewUrlParser: true, useUnifiedTopology: true});
+mongoose.connect('mongodb://mongodb:27017/test', {useNewUrlParser: true, useUnifiedTopology: true});
 
 // view engine setup
 app.engine('hbs', hbs({extname: 'hbs', defaultLayout: 'layout', layoutsDir: __dirname + '/views/layouts/'}));
