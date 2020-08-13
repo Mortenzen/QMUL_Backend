@@ -7,6 +7,7 @@ var jwt = require("jsonwebtoken");
 
 const User = require("../models/user");
 const Moderator = require('../models/moderator');
+const Room = require('../models/room');
 
 /*=================================================
 // READ DATA INTO THE HTLM SITE (mongoose)
@@ -218,5 +219,34 @@ router.post("/insert-moderator", (req, res, next) => {
   });
   res.redirect('/');
 });
+
+
+/*=================================================
+// INSERTING NEW ROOM ON THE HTML PAGE (mongoose)
+===================================================*/
+router.post("/insert-room", (req, res, next) => {
+
+  console.log(req.body);
+
+  // NEW USER MONGOOSE MODEL
+  const room = new Room({
+    _id: new mongoose.Types.ObjectId(),
+    name: req.body.name
+  });
+
+    room
+    .save()
+    .then(result => {
+      console.log('The following item is inserted: \n', result);
+      res.status(200).send();
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({
+        error: err
+      });
+    });
+});
+
 
 module.exports = router;
