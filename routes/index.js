@@ -6,6 +6,7 @@ var mongoose = require("mongoose");
 var jwt = require("jsonwebtoken");
 
 const User = require("../models/user");
+const Moderator = require('../models/moderator');
 
 /*=================================================
 // READ DATA INTO THE HTLM SITE (mongoose)
@@ -180,5 +181,42 @@ function ensureToken(req, res, next) {
     next();
   });
 }
+
+/*=================================================
+// INSERTING NEW MODERATOR ON THE HTML PAGE (mongoose)
+===================================================*/
+router.post("/insert-moderator", (req, res, next) => {
+
+  // BCRYPT VALUE
+  const saltRounds = 10;
+  console.log(req.body);
+
+  // NEW USER MONGOOSE MODEL
+  const moderator = new Moderator({
+    _id: new mongoose.Types.ObjectId(),
+    name: req.body.name,
+    email: req.body.email,
+    hash: req.body.password,
+  });
+
+  // PASSWORD HASHING
+  bcrypt.hash(req.body.password, saltRounds).then(function(hash) {
+    moderator.hash = hash;
+
+    moderator
+    .save()
+    .then(result => {
+      console.log('The following item is inserted: \n', result);
+      res.status(200).send();
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({
+        error: err
+      });
+    });
+  });
+  res.redirect('/');
+});
 
 module.exports = router;
