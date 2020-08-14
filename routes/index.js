@@ -6,8 +6,8 @@ var mongoose = require("mongoose");
 var jwt = require("jsonwebtoken");
 
 const User = require("../models/user");
-const Moderator = require('../models/moderator');
-const Room = require('../models/room');
+const Moderator = require("../models/moderator");
+const Room = require("../models/room");
 
 /*=================================================
 // READ DATA INTO THE HTLM SITE (mongoose)
@@ -187,7 +187,6 @@ function ensureToken(req, res, next) {
 // INSERTING NEW MODERATOR ON THE HTML PAGE (mongoose)
 ===================================================*/
 router.post("/insert-moderator", (req, res, next) => {
-
   // BCRYPT VALUE
   const saltRounds = 10;
   console.log(req.body);
@@ -201,49 +200,47 @@ router.post("/insert-moderator", (req, res, next) => {
   });
 
   // PASSWORD HASHING
-  bcrypt.hash(req.body.password, saltRounds).then(function(hash) {
+  bcrypt.hash(req.body.password, saltRounds).then(function (hash) {
     moderator.hash = hash;
 
     moderator
-    .save()
-    .then(result => {
-      console.log('The following item is inserted: \n', result);
-      res.status(200).send();
-    })
-    .catch(err => {
-      console.log(err);
-      res.status(500).json({
-        error: err
+      .save()
+      .then((result) => {
+        console.log("The following item is inserted: \n", result);
+        res.status(200).send();
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).json({
+          error: err,
+        });
       });
-    });
   });
-  res.redirect('/');
+  res.redirect("/");
 });
-
 
 /*=================================================
 // INSERTING NEW ROOM ON THE HTML PAGE (mongoose)
 ===================================================*/
 router.post("/insert-room", (req, res, next) => {
-
   console.log(req.body);
 
   // NEW USER MONGOOSE MODEL
   const room = new Room({
     _id: new mongoose.Types.ObjectId(),
-    name: req.body.name
+    name: req.body.name,
   });
 
-    room
+  room
     .save()
-    .then(result => {
-      console.log('The following item is inserted: \n', result);
+    .then((result) => {
+      console.log("The following item is inserted: \n", result);
       res.status(200).send();
     })
-    .catch(err => {
+    .catch((err) => {
       console.log(err);
       res.status(500).json({
-        error: err
+        error: err,
       });
     });
 });
@@ -251,17 +248,20 @@ router.post("/insert-room", (req, res, next) => {
 /*=================================================
 // INSERTING EMAILS TO ACCESS IN ROOMS (mongoose)
 ===================================================*/
-router.post('/insert-acceptedusers', function(req, res) {
- 
+router.post("/insert-acceptedusers", function (req, res) {
   const room = new Room({
     name: req.body.name,
-    accepptedUsers: req.body.email
+    accepptedUsers: req.body.email,
   });
-
-  Room.updateOne({"name": req.body.name}, {$set: room}, function(err, result) {
-    res.status(200).send();
+  Room.findOne({ name: { $eq: req.body.name } }, function (err, doc) {
+    if (!err) {
+      doc.accepptedUsers.addToSet(req.body.email);
+      doc.save();
+      res.status(200).send();
+    } else {
+      res.status(500).send();
+    }
   });
 });
-
 
 module.exports = router;
