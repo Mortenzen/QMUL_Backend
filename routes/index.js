@@ -118,24 +118,37 @@ router.post("/login", function (req, res) {
 /*=================================================
 // TAG WRITING ON PHONE (mongoose)
 ===================================================*/
-router.post("/tag", ensureToken, function (req, res) {
-  const user = new User({
-    location: req.body.location,
-  });
-
-  var email = req.body.email;
-  var userEmail = req.user;
-  var jwtEmail = userEmail.user.email;
+router.post("/tag", ensureToken, async function (req, res) {
+  let { email, location } = req.body;
+  let userEmail = req.user;
+  let jwtEmail = userEmail.user.email;
   console.log(email + " compared to " + jwtEmail);
 
   if (jwtEmail == email) {
-    User.updateOne({ email: req.body.email }, { $set: user }, function (
-      err,
-      result
-    ) {
-      console.log("Item updated " + user.location);
-      res.status(200).send();
-    });
+    let room = await Room.findOne({ name: location });
+    if (!!room) {
+      if (room.accepptedUsers.includes(email)) {
+        console.log("Access granted");
+        User.updateOne(
+          { email: email },
+          {
+            $set: {
+              location: location,
+            },
+          },
+          function (err) {
+            console.log(`Item updated ${location}`);
+            res.status(200).send();
+          }
+        );
+      } else {
+        console.log("Access denied");
+        res.status(500).send({error: "Access denied"});
+      }
+    } else {
+      console.log("Unknown location");
+      res.status(500).send({error: "Unknown location"});
+    }
   } else {
     console.log("Email authentication failed...");
     res.status(403).send();
@@ -249,10 +262,6 @@ router.post("/insert-room", (req, res, next) => {
 // INSERTING EMAILS TO ACCESS IN ROOMS (mongoose)
 ===================================================*/
 router.post("/insert-acceptedusers", function (req, res) {
-  const room = new Room({
-    name: req.body.name,
-    accepptedUsers: req.body.email,
-  });
   Room.findOne({ name: { $eq: req.body.name } }, function (err, doc) {
     if (!err && !!doc) {
       doc.accepptedUsers.addToSet(req.body.email);
