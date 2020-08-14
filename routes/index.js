@@ -254,7 +254,7 @@ router.post("/insert-acceptedusers", function (req, res) {
     accepptedUsers: req.body.email,
   });
   Room.findOne({ name: { $eq: req.body.name } }, function (err, doc) {
-    if (!err) {
+    if (!err && !!doc) {
       doc.accepptedUsers.addToSet(req.body.email);
       doc.save();
       res.status(200).send();
