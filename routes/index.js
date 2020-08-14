@@ -248,5 +248,20 @@ router.post("/insert-room", (req, res, next) => {
     });
 });
 
+/*=================================================
+// INSERTING EMAILS TO ACCESS IN ROOMS (mongoose)
+===================================================*/
+router.post('/insert-acceptedusers', function(req, res) {
+ 
+  const room = new Room({
+    name: req.body.name,
+    accepptedUsers: req.body.email
+  });
+
+  Room.updateOne({"name": req.body.name}, {$set: room}, function(err, result) {
+    res.status(200).send();
+  });
+});
+
 
 module.exports = router;
