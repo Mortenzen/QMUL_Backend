@@ -80,79 +80,77 @@ router.post("/delete", function (req, res, next) {
 // LOGIN BY EMAIL AND PASSWORD ON PHONE (mongoose)
 ===================================================*/
 router.post("/login", function (req, res) {
-  User.findOne({
-    email: req.body.email,
-  }, function (err, result) {
-    if (result) {
-      // IF EMAIL FOUND
-      console.log(req.body, result.hash);
-      bcrypt.compare(req.body.password, result.hash).then(function (match) {
-        if (match) {
-          // CORRECT PASSWORD
+  User.findOne(
+    {
+      email: req.body.email,
+    },
+    function (err, result) {
+      if (result) {
+        // IF EMAIL FOUND
+        console.log(req.body, result.hash);
+        bcrypt.compare(req.body.password, result.hash).then(function (match) {
+          if (match) {
+            // CORRECT PASSWORD
 
-          const token = jwt.sign({ result }, "my_secret_key");
-          const objToSend = {
-            name: result.name,
-            email: result.email,
-            token: token,
-          };
+            const token = jwt.sign({ result }, "my_secret_key");
+            const objToSend = {
+              name: result.name,
+              email: result.email,
+              token: token,
+            };
 
-          res.status(200).json(objToSend);
-          console.log(objToSend);
-          console.log("success");
-        } else {
-          // INCORRECT PASSWORD
-          res.status(400).send();
-          console.log("failed");
-        }
-      });
-    } else {
-      // IF NO EMAIL FOUND
-      res.status(400).send();
-      console.log("no email found");
+            res.status(200).json(objToSend);
+            console.log(objToSend);
+            console.log("success");
+          } else {
+            // INCORRECT PASSWORD
+            res.status(400).send();
+            console.log("failed");
+          }
+        });
+      } else {
+        // IF NO EMAIL FOUND
+        res.status(400).send();
+        console.log("no email found");
+      }
     }
-  });
+  );
 });
 
 /*=================================================
 // TAG WRITING ON PHONE (mongoose)
 ===================================================*/
 router.post("/tag", ensureToken, async function (req, res) {
-  console.log(req.body);
-  console.log(req.user);
-  let { email, location } = req.body;
-  let userEmail = req.user;
- // let jwtEmail = userEmail.user.email;
- 
+  let { location } = req.body;
+  let userEmail = req.user.result.email;
+  // let jwtEmail = userEmail.user.email;
 
-  
-    let room = await Room.findOne({ name: location });
-    if (!!room) {
-      if (room.accepptedUsers.includes(email)) {
-        console.log("Access granted");
-        room.state = true
-        room.save()
-        User.updateOne(
-          { email: email },
-          {
-            $set: {
-              location: location,
-            },
+  let room = await Room.findOne({ name: location });
+  if (!!room) {
+    if (room.accepptedUsers.includes(userEmail)) {
+      console.log("Access granted");
+      room.state = true;
+      room.save();
+      User.updateOne(
+        { email: userEmail },
+        {
+          $set: {
+            location: location,
           },
-          function (err) {
-            console.log(`Item updated ${location}`);
-            res.status(200).send();
-          }
-        );
-      } else {
-        console.log("Access denied");
-        res.status(500).send({ error: "Access denied" });
-      }
+        },
+        function (err) {
+          console.log(`Item updated ${location}`);
+          res.status(200).send();
+        }
+      );
     } else {
-      console.log("Unknown location");
-      res.status(500).send({ error: "Unknown location" });
+      console.log("Access denied");
+      res.status(500).send({ error: "Access denied" });
     }
-  
+  } else {
+    console.log("Unknown location");
+    res.status(500).send({ error: "Unknown location" });
+  }
 });
 
 /*=================================================
@@ -233,19 +231,19 @@ router.post("/insert-moderator", (req, res, next) => {
 });
 
 router.get("/check/:roomName", async function (req, res) {
-  let room = await Room.findOne({ name: req.params.roomName })
+  let room = await Room.findOne({ name: req.params.roomName });
   if (room && room.apiKey === req.body.apiKey) {
     if (room.state === true) {
-      room.state = false
-      room.save()
-      res.status(200).send("open")
+      room.state = false;
+      room.save();
+      res.status(200).send("open");
     } else {
-      res.status(200).send("close")
+      res.status(200).send("close");
     }
   } else {
-    res.status(500).json({ error: "Unknown room or wrong API key" })
+    res.status(500).json({ error: "Unknown room or wrong API key" });
   }
-})
+});
 
 /*=================================================
 // INSERTING NEW ROOM ON THE HTML PAGE (mongoose)
