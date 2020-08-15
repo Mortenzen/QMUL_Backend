@@ -118,6 +118,8 @@ router.post("/login", function (req, res) {
 // TAG WRITING ON PHONE (mongoose)
 ===================================================*/
 router.post("/tag", ensureToken, async function (req, res) {
+  console.log(req.body);
+  console.log(req.user);
   let { email, location } = req.body;
   let userEmail = req.user;
   let jwtEmail = userEmail.user.email;
