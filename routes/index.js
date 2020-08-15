@@ -235,7 +235,7 @@ router.post("/insert-moderator", (req, res, next) => {
 
 router.get("/check/:roomName", async function (req, res) {
   let room = await Room.findOne({ name: req.params.roomName })
-  if (room) {
+  if (room && room.apiKey === req.body.apiKey) {
     if (room.state === true) {
       room.state = false
       room.save()
@@ -244,7 +244,7 @@ router.get("/check/:roomName", async function (req, res) {
       res.status(200).send("close")
     }
   } else {
-    res.status(500).json({ error: "Unknown room" })
+    res.status(500).json({ error: "Unknown room or wrong API key" })
   }
 })
 

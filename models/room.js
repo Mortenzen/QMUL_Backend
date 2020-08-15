@@ -5,6 +5,7 @@ var schema = new roomSchema({
   _id: mongoose.Schema.Types.ObjectId,
   name: String,
   state: { type: Boolean, default: false },
+  apiKey: String,
   accepptedUsers: [String]
 },
  { collection : 'room-data' });
