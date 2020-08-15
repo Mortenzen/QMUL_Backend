@@ -143,11 +143,11 @@ router.post("/tag", ensureToken, async function (req, res) {
         );
       } else {
         console.log("Access denied");
-        res.status(500).send({error: "Access denied"});
+        res.status(500).send({ error: "Access denied" });
       }
     } else {
       console.log("Unknown location");
-      res.status(500).send({error: "Unknown location"});
+      res.status(500).send({ error: "Unknown location" });
     }
   } else {
     console.log("Email authentication failed...");
@@ -273,44 +273,44 @@ router.post("/insert-acceptedusers", function (req, res) {
   });
 });
 
-
 /*=================================================
 // LOGIN BY EMAIL AND PASSWORD ADMIN (mongoose)
 ===================================================*/
 router.post("/moderator-login", function (req, res) {
-  const moderator = new Moderator({
-    email: req.body.email,
-  });
+  Moderator.findOne(
+    {
+      email: req.body.email,
+    },
+    function (err, result) {
+      if (result != null) {
+        // IF EMAIL FOUND
+        bcrypt.compare(req.body.password, result.hash).then(function (err, passwmatch) {
+          if (passwmatch) {
+            // CORRECT PASSWORD
 
-  Moderator.findOne(moderator, function (err, result) {
-    if (result != null) {
-      // IF EMAIL FOUND
-      bcrypt.compare(req.body.password, result.hash).then(function (result) {
-        if (result) {
-          // CORRECT PASSWORD
+            const token = jwt.sign({ result }, "my_secret_key");
+            const objToSend = {
+              name: result.name,
+              email: result.email,
+              token: token,
+            };
 
-          const token = jwt.sign({ user }, "my_secret_key");
-          const objToSend = {
-            name: result.name,
-            email: result.email,
-            token: token,
-          };
-
-          res.status(200).json(objToSend);
-          console.log(objToSend);
-          console.log("success");
-        } else {
-          // INCORRECT PASSWORD
-          res.status(400).send();
-          console.log("failed");
-        }
-      });
-    } else {
-      // IF NO EMAIL FOUND
-      res.status(400).send();
-      console.log("no email found");
+            res.status(200).json(objToSend);
+            console.log(objToSend);
+            console.log("success");
+          } else {
+            // INCORRECT PASSWORD
+            res.status(400).send();
+            console.log("failed");
+          }
+        });
+      } else {
+        // IF NO EMAIL FOUND
+        res.status(400).send();
+        console.log("no email found");
+      }
     }
-  });
+  );
 });
 
 module.exports = router;
