@@ -272,12 +272,11 @@ router.post("/insert-acceptedusers", function (req, res) {
   });
 });
 
-
 /*=================================================
 // LOGIN BY EMAIL AND PASSWORD ADMIN (mongoose)
 ===================================================*/
 router.post("/moderator-login", function (req, res) {
-  Moderator.findOne({email: req.body.email}, function (err, result) {
+  Moderator.findOne({ email: req.body.email }, function (err, result) {
     if (result) {
       // IF EMAIL FOUND
       bcrypt.compare(req.body.password, result.hash).then(function (match) {
