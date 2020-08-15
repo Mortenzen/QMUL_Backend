@@ -24,6 +24,17 @@ router.get("/get-data", function (req, res) {
   });
 });
 
+router.get("/get-rooms", function (req, res) {
+  Room.find({}, function (err, room) {
+    var roomMap = {};
+
+    room.forEach(function (room) {
+      roomMap[room._id] = room;
+    });
+
+    res.status(200).json(roomMap);
+  });
+});
 /*=================================================
 // INSERTING NEW USERS ON THE HTML PAGE (mongoose)
 ===================================================*/
