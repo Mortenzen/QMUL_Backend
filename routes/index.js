@@ -248,12 +248,10 @@ router.post("/check/:roomName", async function (req, res) {
     switch (room.state) {
       case "opened":
         room.state = 'closed';
-        room.save();
         res.status(200).send("close");
         break;
       case "opening-request":
         room.state = 'opened';
-        room.save();
         res.status(200).send("open");
         break;
       case "closed":
@@ -261,6 +259,7 @@ router.post("/check/:roomName", async function (req, res) {
       default:
         break;
     }
+    room.save()
   } else {
     res.status(500).json({ error: "Unknown room or wrong API key" });
   }
