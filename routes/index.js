@@ -122,10 +122,10 @@ router.post("/tag", ensureToken, async function (req, res) {
   console.log(req.user);
   let { email, location } = req.body;
   let userEmail = req.user;
-  let jwtEmail = userEmail.user.email;
-  console.log(email + " compared to " + jwtEmail);
+ // let jwtEmail = userEmail.user.email;
+ 
 
-  if (jwtEmail == email) {
+  
     let room = await Room.findOne({ name: location });
     if (!!room) {
       if (room.accepptedUsers.includes(email)) {
@@ -152,10 +152,7 @@ router.post("/tag", ensureToken, async function (req, res) {
       console.log("Unknown location");
       res.status(500).send({ error: "Unknown location" });
     }
-  } else {
-    console.log("Email authentication failed...");
-    res.status(403).send();
-  }
+  
 });
 
 /*=================================================
