@@ -241,7 +241,7 @@ router.post("/insert-moderator", (req, res, next) => {
   res.redirect("/");
 });
 
-router.get("/check/:roomName", async function (req, res) {
+router.post("/check/:roomName", async function (req, res) {
   let room = await Room.findOne({ name: req.params.roomName });
   if (room && room.apiKey === req.body.apiKey) {
     room.lastSeen = new Date();
