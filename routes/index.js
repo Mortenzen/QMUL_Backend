@@ -233,11 +233,13 @@ router.post("/insert-moderator", (req, res, next) => {
 router.get("/check/:roomName", async function (req, res) {
   let room = await Room.findOne({ name: req.params.roomName });
   if (room && room.apiKey === req.body.apiKey) {
+    room.lastSeen = new Date();
     if (room.state === true) {
       room.state = false;
       room.save();
       res.status(200).send("open");
     } else {
+      room.save();
       res.status(200).send("close");
     }
   } else {

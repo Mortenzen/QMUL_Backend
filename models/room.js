@@ -6,6 +6,7 @@ var schema = new roomSchema({
   name: String,
   state: { type: Boolean, default: false },
   apiKey: String,
+  lastSeen: Date,
   accepptedUsers: [String]
 },
  { collection : 'room-data' });
