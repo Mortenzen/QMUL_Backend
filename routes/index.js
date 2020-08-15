@@ -80,18 +80,17 @@ router.post("/delete", function (req, res, next) {
 // LOGIN BY EMAIL AND PASSWORD ON PHONE (mongoose)
 ===================================================*/
 router.post("/login", function (req, res) {
-  const user = new User({
+  User.findOne({
     email: req.body.email,
-  });
-
-  User.findOne(user, function (err, result) {
-    if (result != null) {
+  }, function (err, result) {
+    if (result) {
       // IF EMAIL FOUND
-      bcrypt.compare(req.body.password, result.hash).then(function (result) {
-        if (result) {
+      console.log(req.body, result.hash);
+      bcrypt.compare(req.body.password, result.hash).then(function (match) {
+        if (match) {
           // CORRECT PASSWORD
 
-          const token = jwt.sign({ user }, "my_secret_key");
+          const token = jwt.sign({ result }, "my_secret_key");
           const objToSend = {
             name: result.name,
             email: result.email,
@@ -143,11 +142,11 @@ router.post("/tag", ensureToken, async function (req, res) {
         );
       } else {
         console.log("Access denied");
-        res.status(500).send({error: "Access denied"});
+        res.status(500).send({ error: "Access denied" });
       }
     } else {
       console.log("Unknown location");
-      res.status(500).send({error: "Unknown location"});
+      res.status(500).send({ error: "Unknown location" });
     }
   } else {
     console.log("Email authentication failed...");
@@ -278,18 +277,14 @@ router.post("/insert-acceptedusers", function (req, res) {
 // LOGIN BY EMAIL AND PASSWORD ADMIN (mongoose)
 ===================================================*/
 router.post("/moderator-login", function (req, res) {
-  const moderator = new Moderator({
-    email: req.body.email,
-  });
-
-  Moderator.findOne(moderator, function (err, result) {
-    if (result != null) {
+  Moderator.findOne({email: req.body.email}, function (err, result) {
+    if (result) {
       // IF EMAIL FOUND
-      bcrypt.compare(req.body.password, result.hash).then(function (result) {
-        if (result) {
+      bcrypt.compare(req.body.password, result.hash).then(function (match) {
+        if (match) {
           // CORRECT PASSWORD
 
-          const token = jwt.sign({ user }, "my_secret_key");
+          const token = jwt.sign({ result }, "my_secret_key");
           const objToSend = {
             name: result.name,
             email: result.email,
