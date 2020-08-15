@@ -4,7 +4,11 @@ var roomSchema = mongoose.Schema;
 var schema = new roomSchema({
   _id: mongoose.Schema.Types.ObjectId,
   name: String,
-  state: { type: Boolean, default: false },
+  state: {
+    type: String,
+    enum : ['closed','opening-request','opened'],
+    default: 'closed'
+},
   apiKey: String,
   lastSeen: Date,
   accepptedUsers: [String]

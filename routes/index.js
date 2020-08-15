@@ -140,7 +140,7 @@ router.post("/tag", ensureToken, async function (req, res) {
   if (!!room) {
     if (room.accepptedUsers.includes(userEmail)) {
       console.log("Access granted");
-      room.state = true;
+      room.state = "opening-request";
       room.save();
       User.updateOne(
         { email: userEmail },
@@ -245,13 +245,21 @@ router.get("/check/:roomName", async function (req, res) {
   let room = await Room.findOne({ name: req.params.roomName });
   if (room && room.apiKey === req.body.apiKey) {
     room.lastSeen = new Date();
-    if (room.state === true) {
-      room.state = false;
-      room.save();
-      res.status(200).send("open");
-    } else {
-      room.save();
-      res.status(200).send("close");
+    switch (room.state) {
+      case "opened":
+        room.state = 'closed';
+        room.save();
+        res.status(200).send("close");
+        break;
+      case "opening-request":
+        room.state = 'opened';
+        room.save();
+        res.status(200).send("open");
+        break;
+      case "closed":
+        res.status(200).send("close");
+      default:
+        break;
     }
   } else {
     res.status(500).json({ error: "Unknown room or wrong API key" });
