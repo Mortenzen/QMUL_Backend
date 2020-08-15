@@ -128,6 +128,8 @@ router.post("/tag", ensureToken, async function (req, res) {
     if (!!room) {
       if (room.accepptedUsers.includes(email)) {
         console.log("Access granted");
+        room.state = true
+        room.save()
         User.updateOne(
           { email: email },
           {
@@ -230,6 +232,21 @@ router.post("/insert-moderator", (req, res, next) => {
   });
   res.redirect("/");
 });
+
+router.get("/check/:roomName", async function (req, res) {
+  let room = await Room.findOne({ name: req.params.roomName })
+  if (room) {
+    if (room.state === true) {
+      room.state = false
+      room.save()
+      res.status(200).send("open")
+    } else {
+      res.status(200).send("close")
+    }
+  } else {
+    res.status(500).json({ error: "Unknown room" })
+  }
+})
 
 /*=================================================
 // INSERTING NEW ROOM ON THE HTML PAGE (mongoose)
