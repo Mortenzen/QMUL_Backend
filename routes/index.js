@@ -10,7 +10,7 @@ const Moderator = require("../models/moderator");
 const Room = require("../models/room");
 
 /*=================================================
-// READ DATA INTO THE HTLM SITE (mongoose)
+// READ DATA INTO THE HTLM SITE (mongoose) lol
 ===================================================*/
 router.get("/get-data", function (req, res) {
   User.find({}, function (err, users) {
