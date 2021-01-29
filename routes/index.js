@@ -8,6 +8,7 @@ var jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const Moderator = require("../models/moderator");
 const Room = require("../models/room");
+const ReactUser = require("../models/reactUser");
 
 /*=================================================
 // READ DATA INTO THE HTLM SITE (mongoose) lol
@@ -35,6 +36,7 @@ router.get("/get-rooms", function (req, res) {
     res.status(200).json(roomMap);
   });
 });
+
 /*=================================================
 // INSERTING NEW USERS ON THE HTML PAGE (mongoose)
 ===================================================*/
@@ -338,6 +340,43 @@ router.post("/moderator-login", function (req, res) {
       res.status(400).send();
       console.log("no email found");
     }
+  });
+});
+
+//REACT APP 
+
+/*=================================================
+// INSERTING NEW USERS ON THE REACT SITE (mongoose)
+===================================================*/
+router.post("/reactInsert", (req, res, next) => {
+  // BCRYPT VALUE
+  const saltRounds = 10;
+  console.log(req.body);
+
+  // NEW USER MONGOOSE MODEL
+  const user = new ReactUser({
+    _id: new mongoose.Types.ObjectId(),
+    name: req.body.name,
+    email: req.body.email,
+    hash: req.body.password,
+  });
+
+  // PASSWORD HASHING
+  bcrypt.hash(req.body.password, saltRounds).then(function (hash) {
+    user.hash = hash;
+
+    user
+      .save()
+      .then((result) => {
+        console.log("The following item is inserted: \n", result);
+        res.status(200).send();
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).json({
+          error: err,
+        });
+      });
   });
 });
 
