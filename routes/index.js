@@ -369,7 +369,7 @@ router.post("/reactInsert", (req, res, next) => {
       .save()
       .then((result) => {
         console.log("The following item is inserted: \n", result);
-        res.status(200).send("LOL");
+        res.status(200).send("success");
       })
       .catch((err) => {
         console.log(err);
