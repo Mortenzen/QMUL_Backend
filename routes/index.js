@@ -427,7 +427,7 @@ router.post("/reactLogin", function (req, res) {
         });
       } else {
         // IF NO EMAIL FOUND
-        res.status(400).send();
+        res.status(404).send();
         console.log("no email found");
       }
     }
