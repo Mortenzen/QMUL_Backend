@@ -369,7 +369,7 @@ router.post("/reactInsert", (req, res, next) => {
       .save()
       .then((result) => {
         console.log("The following item is inserted: \n", result);
-        res.status(200).send();
+        res.status(200).send("LOL");
       })
       .catch((err) => {
         console.log(err);
@@ -378,6 +378,47 @@ router.post("/reactInsert", (req, res, next) => {
         });
       });
   });
+});
+
+/*=================================================
+// LOGIN BY EMAIL AND PASSWORD ON REACT SITE (mongoose)
+===================================================*/
+router.post("/reactLogin", function (req, res) {
+  ReactUser.findOne(
+    {
+      email: req.body.email,
+    },
+    function (err, result) {
+      if (result) {
+        // IF EMAIL FOUND
+        console.log(req.body, result.hash);
+        bcrypt.compare(req.body.password, result.hash).then(function (match) {
+          if (match) {
+            // CORRECT PASSWORD
+
+            const token = jwt.sign({ result }, "my_secret_key");
+            const objToSend = {
+              name: result.name,
+              email: result.email,
+              token: token,
+            };
+
+            res.status(200).json(objToSend);
+            console.log(objToSend);
+            console.log("success");
+          } else {
+            // INCORRECT PASSWORD
+            res.status(400).send();
+            console.log("failed");
+          }
+        });
+      } else {
+        // IF NO EMAIL FOUND
+        res.status(400).send();
+        console.log("no email found");
+      }
+    }
+  );
 });
 
 module.exports = router;
