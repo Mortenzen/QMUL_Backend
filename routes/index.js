@@ -353,31 +353,44 @@ router.post("/reactInsert", (req, res, next) => {
   const saltRounds = 10;
   console.log(req.body);
 
-  // NEW USER MONGOOSE MODEL
-  const user = new ReactUser({
-    _id: new mongoose.Types.ObjectId(),
-    name: req.body.name,
-    email: req.body.email,
-    hash: req.body.password,
-  });
-
-  // PASSWORD HASHING
-  bcrypt.hash(req.body.password, saltRounds).then(function (hash) {
-    user.hash = hash;
-
-    user
-      .save()
-      .then((result) => {
-        console.log("The following item is inserted: \n", result);
-        res.status(200).send("success");
-      })
-      .catch((err) => {
-        console.log(err);
-        res.status(500).json({
-          error: err,
+  ReactUser.findOne(
+    {
+      email: req.body.email,
+    },
+    function (err, result) {
+      if (!result) {
+        // NEW USER MONGOOSE MODEL
+        const user = new ReactUser({
+          _id: new mongoose.Types.ObjectId(),
+          name: req.body.name,
+          email: req.body.email,
+          hash: req.body.password,
         });
-      });
-  });
+
+        // PASSWORD HASHING
+        bcrypt.hash(req.body.password, saltRounds).then(function (hash) {
+          user.hash = hash;
+
+          user
+            .save()
+            .then((result) => {
+              console.log("The following item is inserted: \n", result);
+              res.status(200).send("success");
+            })
+            .catch((err) => {
+              console.log(err);
+              res.status(500).json({
+                error: err,
+              });
+            });
+        });
+      } else {
+        // IF NO EMAIL FOUND
+        res.status(400).send("emailAlreadyInUse");
+        console.log("Email already in use.");
+      }
+    }
+  );
 });
 
 /*=================================================
