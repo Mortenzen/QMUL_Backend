@@ -437,7 +437,7 @@ router.post("/reactLogin", function (req, res) {
 /*=================================================
 // GET USER ON REACT SITE (mongoose)
 ===================================================*/
-router.get("/reactGetUser", function (req, res) {
+router.get("/reactGetUser", ensureToken, function (req, res) {
   ReactUser.find({}, function (err, users) {
     var userMap = {};
 
