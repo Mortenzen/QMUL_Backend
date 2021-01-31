@@ -183,12 +183,13 @@ router.post("/update", (req, res, next) => {
   bcrypt.hash(req.body.password, saltRounds).then(function (hash) {
     user.hash = hash;
 
-    User.updateOne({ _id: objectId(id) }, { $set: user }, function (
-      err,
-      result
-    ) {
-      console.log("Item updated");
-    });
+    User.updateOne(
+      { _id: objectId(id) },
+      { $set: user },
+      function (err, result) {
+        console.log("Item updated");
+      }
+    );
   });
   res.status(200).send();
 });
@@ -196,16 +197,15 @@ router.post("/update", (req, res, next) => {
 // function
 function ensureToken(req, res, next) {
   let authHeader = req.headers["authorization"];
- // authHeader = authHeader.split(" ")[1];
-
+  // authHeader = authHeader.split(" ")[1];
   const token = authHeader && authHeader.split(" ")[1];
   if (token == null) res.status(401).send();
 
-  jwt.verify(authHeader, "my_secret_key", (err, user) => {
+  jwt.verify(token, "my_secret_key", (err, user) => {
     if (err) return res.status(403).send();
     req.user = user;
     //var lol = user.user.email;
-  
+
     next();
   });
 }
@@ -252,11 +252,11 @@ router.post("/check/:roomName", async function (req, res) {
     room.lastSeen = new Date();
     switch (room.state) {
       case "opened":
-        room.state = 'closed';
+        room.state = "closed";
         res.status(200).send("close");
         break;
       case "opening-request":
-        room.state = 'opened';
+        room.state = "opened";
         res.status(200).send("open");
         break;
       case "closed":
@@ -264,7 +264,7 @@ router.post("/check/:roomName", async function (req, res) {
       default:
         break;
     }
-    room.save()
+    room.save();
   } else {
     res.status(500).json({ error: "Unknown room or wrong API key" });
   }
@@ -346,7 +346,7 @@ router.post("/moderator-login", function (req, res) {
   });
 });
 
-//REACT APP 
+//REACT APP
 
 /*=================================================
 // INSERTING NEW USERS ON THE REACT SITE (mongoose)
@@ -406,17 +406,18 @@ router.post("/reactLogin", function (req, res) {
     },
     function (err, result) {
       if (result) {
+        let { email, name, todo, hash } = result;
         // IF EMAIL FOUND
-        console.log(req.body, result.hash);
-        bcrypt.compare(req.body.password, result.hash).then(function (match) {
+        console.log(req.body, hash);
+        bcrypt.compare(req.body.password, hash).then(function (match) {
           if (match) {
             // CORRECT PASSWORD
 
-            const token = jwt.sign({ result }, "my_secret_key");
+            const token = jwt.sign({ email, name, todo }, "my_secret_key");
             const objToSend = {
-              name: result.name,
-              email: result.email,
-              token: token,
+              name,
+              email,
+              token,
             };
 
             res.status(200).json(objToSend);
@@ -442,15 +443,14 @@ router.post("/reactLogin", function (req, res) {
 ===================================================*/
 router.get("/reactGetUser", ensureToken, function (req, res) {
   let param = req.user.email;
-
-  ReactUser.findOne({ email: param }).select("email toDo name").exec(  function (err, user) {
-    if(err) {
-      res.sendStatus(403)
+  // ReactUser.findOne({ email: param }, "email toDo name", function (err, user) {
+  ReactUser.findOne({ email: param }, "name email toDo -_id", function (err, user) {
+    if (err) {
+      res.sendStatus(403);
       return;
-    };
-    res.status(200).json({user});
+    }
+    res.status(200).json(user);
   });
 });
-
 
 module.exports = router;
