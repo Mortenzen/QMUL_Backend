@@ -196,9 +196,9 @@ router.post("/update", (req, res, next) => {
 // function
 function ensureToken(req, res, next) {
   let authHeader = req.headers["authorization"];
-  authHeader = authHeader.split(" ")[1];
+ // authHeader = authHeader.split(" ")[1];
 
-  const token = authHeader && authHeader.split(".")[1];
+  const token = authHeader && authHeader.split(" ")[1];
   if (token == null) res.status(401).send();
 
   jwt.verify(authHeader, "my_secret_key", (err, user) => {
