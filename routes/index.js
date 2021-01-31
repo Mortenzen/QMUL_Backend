@@ -195,7 +195,9 @@ router.post("/update", (req, res, next) => {
 
 // function
 function ensureToken(req, res, next) {
-  const authHeader = req.headers["authorization"];
+  let authHeader = req.headers["authorization"];
+  authHeader = authHeader.split(" ")[1];
+
   const token = authHeader && authHeader.split(".")[1];
   if (token == null) res.status(401).send();
 
