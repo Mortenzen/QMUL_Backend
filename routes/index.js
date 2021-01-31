@@ -438,7 +438,9 @@ router.post("/reactLogin", function (req, res) {
 // GET USER ON REACT SITE (mongoose)
 ===================================================*/
 router.get("/reactGetUser", ensureToken, function (req, res) {
-  ReactUser.findOne({ email: req.body.email }, function (err, user) {
+  let param = req.query.email;
+
+  ReactUser.findOne({ param }, function (err, user) {
     var userFound = user;
     res.status(200).json(userFound);
   });
