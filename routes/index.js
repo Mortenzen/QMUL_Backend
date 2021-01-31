@@ -205,6 +205,7 @@ function ensureToken(req, res, next) {
     if (err) return res.status(403).send();
     req.user = user;
     //var lol = user.user.email;
+  
     next();
   });
 }
@@ -440,7 +441,7 @@ router.post("/reactLogin", function (req, res) {
 // GET USER ON REACT SITE (mongoose)
 ===================================================*/
 router.get("/reactGetUser", ensureToken, function (req, res) {
-  let param = req.body.email;
+  let param = req.user.email;
 
   ReactUser.findOne({ email: param }, function (err, user) {
     if(err) {
