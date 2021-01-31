@@ -440,7 +440,11 @@ router.post("/reactLogin", function (req, res) {
 router.get("/reactGetUser", ensureToken, function (req, res) {
   let param = req.body.email;
 
-  ReactUser.findOne({ param }, function (err, user) {
+  ReactUser.findOne({ email: param }, function (err, user) {
+    if(err) {
+      res.sendStatus(403)
+      return;
+    };
     var userFound = user;
     res.status(200).json(userFound);
   });
