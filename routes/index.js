@@ -434,4 +434,20 @@ router.post("/reactLogin", function (req, res) {
   );
 });
 
+/*=================================================
+// GET USER ON REACT SITE (mongoose)
+===================================================*/
+router.get("/reactGetUser", function (req, res) {
+  ReactUser.find({}, function (err, users) {
+    var userMap = {};
+
+    users.forEach(function (user) {
+      userMap[user._id] = user;
+    });
+
+    res.status(200).json(userMap);
+  });
+});
+
+
 module.exports = router;
