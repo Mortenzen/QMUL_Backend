@@ -483,7 +483,7 @@ router.post("/reactDeleteToDo", ensureToken, function (req, res) {
         doc.save();
       }
       
-      res.status(200).send(indexArray);
+      res.status(200).send(doc);
 
 
 
