@@ -480,9 +480,9 @@ router.post("/reactDeleteToDo", ensureToken, function (req, res) {
 
       for(let i=0; i<indexArray.length; i++){
         doc.toDo.splice(indexArray[i]-i,1);
-
+        doc.save();
       }
-      doc.save();
+      
       res.status(200).send("success");
 
 
