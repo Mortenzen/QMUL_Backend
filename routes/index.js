@@ -471,19 +471,28 @@ router.post("/reactNewToDo", ensureToken, function (req, res) {
 /*=================================================
 // DELETING TODO ELEMENTS ON THE REACT SITE (mongoose)
 ===================================================*/
-/*
+
 router.post("/reactDeleteToDo", ensureToken, function (req, res) {
   ReactUser.findOne({ email: { $eq: req.body.email } }, function (err, doc) {
+    let indexArray = req.body.indexArray;
+
     if (!err && !!doc) {
-      doc.toDo.addToSet(req.body.newToDo);
+
+      for(let i=0; i<indexArray.length; i++){
+        doc.toDo.splice(indexArray[i]-i,1);
+
+      }
       doc.save();
       res.status(200).send("success");
+
+
+
     } else {
       res.status(500).send("failed");
     }
   });
 });
-*/
+
 
 
 module.exports = router;
