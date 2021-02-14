@@ -453,11 +453,10 @@ router.get("/reactGetUser", ensureToken, function (req, res) {
   });
 });
 
-
 /*=================================================
 // INSERTING NEW TO DO ON THE REACT SITE (mongoose)
 ===================================================*/
-router.post("/reactNewToDo", function (req, res) {
+router.post("/reactNewToDo", ensureToken, function (req, res) {
   ReactUser.findOne({ email: { $eq: req.body.email } }, function (err, doc) {
     if (!err && !!doc) {
       doc.toDo.addToSet(req.body.newToDo);
@@ -469,6 +468,22 @@ router.post("/reactNewToDo", function (req, res) {
   });
 });
 
+/*=================================================
+// DELETING TODO ELEMENTS ON THE REACT SITE (mongoose)
+===================================================*/
+/*
+router.post("/reactDeleteToDo", ensureToken, function (req, res) {
+  ReactUser.findOne({ email: { $eq: req.body.email } }, function (err, doc) {
+    if (!err && !!doc) {
+      doc.toDo.addToSet(req.body.newToDo);
+      doc.save();
+      res.status(200).send("success");
+    } else {
+      res.status(500).send("failed");
+    }
+  });
+});
+*/
 
 
 module.exports = router;
